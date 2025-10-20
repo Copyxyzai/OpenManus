@@ -137,6 +137,34 @@ For unstable multi-agent version, you also can run:
 python run_flow.py
 ```
 
+### Web interface (experimental)
+
+Before launching the server ensure the optional web dependencies are installed:
+
+```bash
+pip install fastapi uvicorn pydantic
+# or install everything from requirements.txt
+pip install -r requirements.txt
+```
+
+To try the browser-based experience, start the FastAPI server:
+
+```bash
+uvicorn app.web.server:app --reload
+```
+
+Then open <http://localhost:8000> to access the chat UI. Each browser tab keeps its
+own session and conversations are stored in memory while the server is running.
+
+Alternatively, you can launch the bundled runner which wraps `uvicorn`:
+
+```bash
+python -m app.web.server --host 0.0.0.0 --port 8000
+```
+
+Pass `--reload` for auto-reload in development environments.
+
+
 ### Custom Adding Multiple Agents
 
 Currently, besides the general OpenManus Agent, we have also integrated the DataAnalysis Agent, which is suitable for data analysis and data visualization tasks. You can add this agent to `run_flow` in `config.toml`.
