@@ -8,7 +8,6 @@ from app.config import SandboxSettings
 from app.exceptions import ToolError
 from app.sandbox.client import SANDBOX_CLIENT
 
-
 PathLike = Union[str, Path]
 
 
@@ -80,8 +79,8 @@ class LocalFileOperator(FileOperator):
             )
             return (
                 process.returncode or 0,
-                stdout.decode(),
-                stderr.decode(),
+                stdout.decode(errors="replace") if stdout else "",
+                stderr.decode(errors="replace") if stderr else "",
             )
         except asyncio.TimeoutError as exc:
             try:

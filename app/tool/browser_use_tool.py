@@ -12,8 +12,8 @@ from pydantic_core.core_schema import ValidationInfo
 
 from app.config import config
 from app.llm import LLM
-from app.tool.base import BaseTool, ToolResult
-from app.tool.web_search import WebSearch
+from app.tools.base import BaseTool, ToolResult
+from app.tools.web.web_search import WebSearch
 
 
 _BROWSER_DESCRIPTION = """\

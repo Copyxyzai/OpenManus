@@ -5,7 +5,6 @@ from loguru import logger as _logger
 
 from app.config import PROJECT_ROOT
 
-
 _print_level = "INFO"
 
 
@@ -20,8 +19,13 @@ def define_log_level(print_level="INFO", logfile_level="DEBUG", name: str = None
         f"{name}_{formatted_date}" if name else formatted_date
     )  # name a log with prefix name
 
+    logger_format = (
+        "<green>{time:HH:mm:ss}</green> | "
+        "<level>{level: <8}</level> | "
+        "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>"
+    )
     _logger.remove()
-    _logger.add(sys.stderr, level=print_level)
+    _logger.add(sys.stderr, level=print_level, format=logger_format)
     _logger.add(PROJECT_ROOT / f"logs/{log_name}.log", level=logfile_level)
     return _logger
 

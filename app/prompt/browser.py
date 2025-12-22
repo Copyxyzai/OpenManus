@@ -67,6 +67,9 @@ Common action sequences:
 
 9. Extraction:
 - If your task is to find information - call extract_content on the specific pages to get and store the information.
+- IMPORTANT: After extracting content, if you found the requested information (e.g., a list of items), present the results and use the done/terminate action.
+- Do NOT keep scrolling and re-extracting if you already have the information needed.
+- Be efficient: extract once, format the results, and complete the task.
 Your responses must be always JSON with the specified format.
 """
 

@@ -1,0 +1,37 @@
+# OpenManus - Development Requirements
+# Install alongside requirements.txt for development
+
+# Testing
+pytest-xdist~=3.6.1              # Parallel test execution
+pytest-timeout~=2.3.1            # Test timeouts
+pytest-randomly~=3.16.0           # Randomize test order
+coverage~=7.7.0                   # Code coverage
+
+# Type Checking
+mypy-extensions~=1.1.0
+types-requests~=2.32.4.20250913
+types-pyyaml~=6.0.1.20250124
+types-psutil~=7.0.0.20251001
+
+# Documentation
+sphinx~=8.2.3
+sphinx-rtd-theme~=3.0.2
+myst-parser~=4.1.1
+
+# Code Quality
+flake8~=7.2.2
+bandit~=1.8.1                    # Security linting
+safety~=3.3.1                    # Dependency security check
+
+# Profiling
+memory-profiler~=0.61.0
+py-spy~=0.4.1
+snakeviz~=2.2.0
+
+# Jupyter
+jupyter~=1.1.1
+ipython~=9.1.0
+notebook~=7.3.3
+
+# Git hooks
+pre-commit-hooks~=5.0.0

@@ -1,25 +1,30 @@
+from datetime import datetime
 from typing import Dict, List, Optional
 
-from pydantic import Field, model_validator
+from pydantic import Field, PrivateAttr, model_validator
 
 from app.agent.browser import BrowserContextHelper
 from app.agent.toolcall import ToolCallAgent
 from app.config import config
 from app.logger import logger
+from app.memory.context_manager import ContextManager
 from app.prompt.manus import NEXT_STEP_PROMPT, SYSTEM_PROMPT
-from app.tool import Terminate, ToolCollection
-from app.tool.ask_human import AskHuman
-from app.tool.browser_use_tool import BrowserUseTool
-from app.tool.mcp import MCPClients, MCPClientTool
-from app.tool.python_execute import PythonExecute
-from app.tool.str_replace_editor import StrReplaceEditor
+from app.tools import Terminate, ToolCollection
+from app.tools.ai.audio_transcription import AudioTool
+from app.tools.ai.memory import MemoryTool
+from app.tools.core.python_execute import PythonExecute
+from app.tools.core.str_replace_editor import StrReplaceEditor
+from app.tools.mcp_tool import MCPClients, MCPClientTool
+from app.tools.web.browser_use import BrowserUseTool
 
 
 class Manus(ToolCallAgent):
     """A versatile general-purpose agent with support for both local and MCP tools."""
 
     name: str = "Manus"
-    description: str = "A versatile agent that can solve various tasks using multiple tools including MCP-based tools"
+    description: str = (
+        "A versatile agent that can solve various tasks using multiple tools including MCP-based tools"
+    )
 
     system_prompt: str = SYSTEM_PROMPT.format(directory=config.workspace_root)
     next_step_prompt: str = NEXT_STEP_PROMPT
@@ -36,8 +41,9 @@ class Manus(ToolCallAgent):
             PythonExecute(),
             BrowserUseTool(),
             StrReplaceEditor(),
-            AskHuman(),
             Terminate(),
+            MemoryTool(),
+            AudioTool(),
         )
     )
 
@@ -50,10 +56,16 @@ class Manus(ToolCallAgent):
     )  # server_id -> url/command
     _initialized: bool = False
 
+    # Context management for long-term memory
+    _context_manager: ContextManager = PrivateAttr()
+    _session_id: str = PrivateAttr()
+
     @model_validator(mode="after")
     def initialize_helper(self) -> "Manus":
         """Initialize basic components synchronously."""
         self.browser_context_helper = BrowserContextHelper(self)
+        self._context_manager = ContextManager()
+        self._session_id = datetime.now().strftime("%Y%m%d-%H%M%S")
         return self
 
     @classmethod
@@ -161,5 +173,45 @@ class Manus(ToolCallAgent):
 
         # Restore original prompt
         self.next_step_prompt = original_prompt
+
+        return result
+
+    async def run(self, request: str = "") -> str:
+        """Override run to add automatic context loading and saving."""
+        # Load relevant historical context
+        try:
+            context = await self._context_manager.load_relevant_context(request, k=3)
+            if context:
+                # Inject context into system prompt
+                original_prompt = self.system_prompt
+                self.system_prompt = f"{original_prompt}\n\n{context}"
+                logger.info("📚 Loaded relevant historical context")
+        except Exception as e:
+            logger.warning(f"Failed to load context: {e}")
+
+        # Execute as normal
+        result = await super().run(request)
+
+        # Save conversation summary after execution
+        try:
+            # Extract tools used from memory
+            tools_used = []
+            for msg in self.memory.messages:
+                if hasattr(msg, "tool_calls") and msg.tool_calls:
+                    for tc in msg.tool_calls:
+                        if hasattr(tc, "function") and hasattr(tc.function, "name"):
+                            tools_used.append(tc.function.name)
+
+            await self._context_manager.save_conversation(
+                session_id=self._session_id,
+                messages=[
+                    msg.model_dump() if hasattr(msg, "model_dump") else msg
+                    for msg in self.memory.messages
+                ],
+                tools_used=list(set(tools_used)),
+            )
+            logger.info(f"💾 Saved conversation summary (Session: {self._session_id})")
+        except Exception as e:
+            logger.warning(f"Failed to save context: {e}")
 
         return result

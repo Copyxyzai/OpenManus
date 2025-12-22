@@ -1,0 +1,28 @@
+# OpenManus Agent Configuration
+
+[agent]
+# Maximum number of steps per task execution
+max_steps = 15 # Reduced from 30 for faster execution
+
+# Timeout for task execution (seconds)
+timeout = 180 # Reduced from 300 (3 minutes)
+
+# Enable debug mode
+debug = false
+
+# Verbose logging
+verbose_logging = false
+
+[performance]
+# Enable LLM response caching
+enable_llm_cache = true
+llm_cache_max_size = 1000
+llm_cache_ttl = 3600      # 1 hour in seconds
+
+# Enable parallel tool execution
+enable_parallel_tools = true
+max_concurrent_tools = 3
+
+# Connection pooling
+http_max_connections = 100
+http_max_keepalive = 20

@@ -9,7 +9,7 @@ from app.exceptions import TokenLimitExceeded
 from app.logger import logger
 from app.prompt.toolcall import NEXT_STEP_PROMPT, SYSTEM_PROMPT
 from app.schema import TOOL_CHOICE_TYPE, AgentState, Message, ToolCall, ToolChoice
-from app.tool import CreateChatCompletion, Terminate, ToolCollection
+from app.tools import CreateChatCompletion, Terminate, ToolCollection
 
 
 TOOL_CALL_REQUIRED = "Tool calls required but none provided"

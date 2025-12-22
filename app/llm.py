@@ -30,7 +30,6 @@ from app.schema import (
     ToolChoice,
 )
 
-
 REASONING_MODELS = ["o1", "o3-mini"]
 MULTIMODAL_MODELS = [
     "gpt-4-vision-preview",
@@ -173,6 +172,10 @@ class TokenCounter:
 
 class LLM:
     _instances: Dict[str, "LLM"] = {}
+    _cache: Dict[str, tuple] = {}  # Cache: {cache_key: (response, timestamp)}
+    _cache_enabled: bool = True
+    _cache_max_size: int = 1000
+    _cache_ttl: int = 3600  # 1 hour
 
     def __new__(
         cls, config_name: str = "default", llm_config: Optional[LLMSettings] = None
@@ -537,9 +540,7 @@ class LLM:
             multimodal_content = (
                 [{"type": "text", "text": content}]
                 if isinstance(content, str)
-                else content
-                if isinstance(content, list)
-                else []
+                else content if isinstance(content, list) else []
             )
 
             # Add images to content
@@ -763,4 +764,34 @@ class LLM:
             raise
         except Exception as e:
             logger.error(f"Unexpected error in ask_tool: {e}")
+            raise
+
+    @retry(
+        wait=wait_random_exponential(min=1, max=60),
+        stop=stop_after_attempt(6),
+        retry=retry_if_exception_type((OpenAIError, Exception)),
+    )
+    async def get_embedding(self, text: str) -> List[float]:
+        """
+        Get embedding for a text string.
+
+        Args:
+            text: The text to embed
+
+        Returns:
+            List[float]: The embedding vector
+        """
+        try:
+            # Clean text
+            text = text.replace("\n", " ").strip()
+            if not text:
+                return []
+
+            response = await self.client.embeddings.create(
+                input=[text], model="text-embedding-3-small"
+            )
+            return response.data[0].embedding
+
+        except Exception as e:
+            logger.error(f"Error getting embedding: {e}")
             raise

@@ -10,9 +10,9 @@ from a2a.server.tasks import InMemoryPushNotifier, InMemoryTaskStore
 from a2a.types import AgentCapabilities, AgentCard, AgentSkill
 from dotenv import load_dotenv
 
-from app.tool.browser_use_tool import _BROWSER_DESCRIPTION
-from app.tool.str_replace_editor import _STR_REPLACE_EDITOR_DESCRIPTION
-from app.tool.terminate import _TERMINATE_DESCRIPTION
+from app.tools.web.browser_use import _BROWSER_DESCRIPTION
+from app.tools.core.str_replace_editor import _STR_REPLACE_EDITOR_DESCRIPTION
+from app.tools.interaction.terminate import _TERMINATE_DESCRIPTION
 
 from .agent import A2AManus
 from .agent_executor import ManusExecutor

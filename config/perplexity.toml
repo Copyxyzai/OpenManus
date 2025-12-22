@@ -1,0 +1,56 @@
+[search]
+# Number of results to return by default
+default_num_results = 5
+
+# Maximum number of results allowed
+max_num_results = 10
+
+# Cache time-to-live in seconds (1 hour)
+cache_ttl = 3600
+
+# Maximum cache size (number of entries)
+cache_max_size = 100
+
+[deep_search]
+# Maximum number of sources to analyze
+max_sources = 10
+
+# Maximum characters for standard depth
+standard_max_chars = 3000
+
+# Maximum characters for comprehensive depth
+comprehensive_max_chars = 8000
+
+# Timeout for scraping single source (seconds)
+scraping_timeout = 30
+
+[rate_limit]
+# Maximum API calls per hour
+max_calls_per_hour = 50
+
+# Rate limit period in seconds
+period_seconds = 3600
+
+[engines]
+# Primary search engine
+primary = "duckduckgo"
+
+# Fallback engines (in order)
+fallbacks = ["bing_fallback"]
+
+[retry]
+# Maximum retry attempts
+max_attempts = 3
+
+# Minimum wait time between retries (seconds)
+min_wait = 4
+
+# Maximum wait time between retries (seconds)
+max_wait = 10
+
+[sanitization]
+# Maximum query length
+max_query_length = 500
+
+# Minimum query length
+min_query_length = 2

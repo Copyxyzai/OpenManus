@@ -1,10 +1,15 @@
 import json
+import os
 import threading
 import tomllib
 from pathlib import Path
 from typing import Dict, List, Optional
 
+from dotenv import load_dotenv
 from pydantic import BaseModel, Field
+
+# Load environment variables
+load_dotenv()
 
 
 def get_project_root() -> Path:
@@ -106,7 +111,7 @@ class SandboxSettings(BaseModel):
 
 
 class DaytonaSettings(BaseModel):
-    daytona_api_key: str
+    daytona_api_key: Optional[str] = Field(None, description="Daytona API Key")
     daytona_server_url: Optional[str] = Field(
         "https://app.daytona.io/api", description=""
     )
@@ -237,14 +242,26 @@ class Config:
             k: v for k, v in raw_config.get("llm", {}).items() if isinstance(v, dict)
         }
 
+        api_key_env = os.getenv("MANUS_LLM_API_KEY")
+        if not api_key_env and raw_config.get("llm", {}).get("api_type") == "openai":
+            api_key_env = os.getenv("MANUS_OPENAI_API_KEY")
+        elif (
+            not api_key_env and raw_config.get("llm", {}).get("api_type") == "anthropic"
+        ):
+            api_key_env = os.getenv("MANUS_ANTHROPIC_API_KEY")
+
         default_settings = {
-            "model": base_llm.get("model"),
-            "base_url": base_llm.get("base_url"),
-            "api_key": base_llm.get("api_key"),
-            "max_tokens": base_llm.get("max_tokens", 4096),
+            "model": os.getenv("MANUS_LLM_MODEL", base_llm.get("model")),
+            "base_url": os.getenv("MANUS_LLM_BASE_URL", base_llm.get("base_url")),
+            "api_key": api_key_env or base_llm.get("api_key"),
+            "max_tokens": int(
+                os.getenv("MANUS_LLM_MAX_TOKENS", base_llm.get("max_tokens", 4096))
+            ),
             "max_input_tokens": base_llm.get("max_input_tokens"),
-            "temperature": base_llm.get("temperature", 1.0),
-            "api_type": base_llm.get("api_type", ""),
+            "temperature": float(
+                os.getenv("MANUS_LLM_TEMPERATURE", base_llm.get("temperature", 1.0))
+            ),
+            "api_type": os.getenv("MANUS_LLM_API_TYPE", base_llm.get("api_type", "")),
             "api_version": base_llm.get("api_version", ""),
         }
 
@@ -281,19 +298,56 @@ class Config:
             if valid_browser_params:
                 browser_settings = BrowserSettings(**valid_browser_params)
 
+        # Override with env vars
+        if os.getenv("MANUS_BROWSER_HEADLESS"):
+            if not browser_settings:
+                browser_settings = BrowserSettings()
+            browser_settings.headless = (
+                os.getenv("MANUS_BROWSER_HEADLESS").lower() == "true"
+            )
+
+        if os.getenv("MANUS_BROWSER_DISABLE_SECURITY"):
+            if not browser_settings:
+                browser_settings = BrowserSettings()
+            browser_settings.disable_security = (
+                os.getenv("MANUS_BROWSER_DISABLE_SECURITY").lower() == "true"
+            )
+
         search_config = raw_config.get("search", {})
         search_settings = None
         if search_config:
             search_settings = SearchSettings(**search_config)
+
+        # Override search with env vars
+        if os.getenv("MANUS_SEARCH_ENGINE"):
+            if not search_settings:
+                search_settings = SearchSettings()
+            search_settings.engine = os.getenv("MANUS_SEARCH_ENGINE")
+
         sandbox_config = raw_config.get("sandbox", {})
         if sandbox_config:
             sandbox_settings = SandboxSettings(**sandbox_config)
         else:
             sandbox_settings = SandboxSettings()
+
+        # Override sandbox with env vars
+        if os.getenv("MANUS_USE_SANDBOX"):
+            sandbox_settings.use_sandbox = (
+                os.getenv("MANUS_USE_SANDBOX").lower() == "true"
+            )
         daytona_config = raw_config.get("daytona", {})
+        daytona_config = raw_config.get("daytona", {})
+        daytona_settings = None
         if daytona_config:
             daytona_settings = DaytonaSettings(**daytona_config)
-        else:
+
+        # Override daytona with env vars
+        if os.getenv("MANUS_DAYTONA_API_KEY"):
+            if not daytona_settings:
+                daytona_settings = DaytonaSettings()
+            daytona_settings.daytona_api_key = os.getenv("MANUS_DAYTONA_API_KEY")
+
+        if not daytona_settings:
             daytona_settings = DaytonaSettings()
 
         mcp_config = raw_config.get("mcp", {})

@@ -7,10 +7,9 @@ from pydantic import Field
 
 from app.config import config
 from app.daytona.sandbox import create_sandbox, start_supervisord_session
-from app.tool.base import BaseTool
+from app.tools.base import BaseTool
 from app.utils.files_utils import clean_path
 from app.utils.logger import logger
-
 
 # load_dotenv()
 daytona_settings = config.daytona
@@ -19,7 +18,11 @@ daytona_config = DaytonaConfig(
     server_url=daytona_settings.daytona_server_url,
     target=daytona_settings.daytona_target,
 )
-daytona = Daytona(daytona_config)
+if daytona_config.api_key:
+    daytona = Daytona(daytona_config)
+else:
+    daytona = None
+    logger.warning("No Daytona API key found. Sandbox tools will be disabled.")
 
 
 @dataclass

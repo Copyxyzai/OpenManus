@@ -6,8 +6,8 @@ from app.agent.toolcall import ToolCallAgent
 from app.logger import logger
 from app.prompt.mcp import MULTIMEDIA_RESPONSE_PROMPT, NEXT_STEP_PROMPT, SYSTEM_PROMPT
 from app.schema import AgentState, Message
-from app.tool.base import ToolResult
-from app.tool.mcp import MCPClients
+from app.tools.base import ToolResult
+from app.tools.mcp_tool import MCPClients
 
 
 class MCPAgent(ToolCallAgent):

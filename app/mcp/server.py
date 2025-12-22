@@ -14,11 +14,11 @@ from typing import Any, Dict, Optional
 from mcp.server.fastmcp import FastMCP
 
 from app.logger import logger
-from app.tool.base import BaseTool
+from app.tools.base import BaseTool
 from app.tool.bash import Bash
-from app.tool.browser_use_tool import BrowserUseTool
-from app.tool.str_replace_editor import StrReplaceEditor
-from app.tool.terminate import Terminate
+from app.tools.web.browser_use import BrowserUseTool
+from app.tools.core.str_replace_editor import StrReplaceEditor
+from app.tools.interaction.terminate import Terminate
 
 
 class MCPServer:

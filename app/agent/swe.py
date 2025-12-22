@@ -4,7 +4,7 @@ from pydantic import Field
 
 from app.agent.toolcall import ToolCallAgent
 from app.prompt.swe import SYSTEM_PROMPT
-from app.tool import Bash, StrReplaceEditor, Terminate, ToolCollection
+from app.tools import Bash, StrReplaceEditor, Terminate, ToolCollection
 
 
 class SWEAgent(ToolCallAgent):

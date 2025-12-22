@@ -1,0 +1,9 @@
+Starting debug...
+1. Testing List input: [{'role': 'system', 'content': 'You are a helpful assistant.'}, {'role': 'user', 'content': 'Hello'}]
+Success (List)!
+Response(id='resp_0220b23f8cda4c96006943aa3a72a48193b8a1ecd37a83f014', created_at=1766042170.0, error=None, incomplete_details=None, instructions=None, metadata={}, model='gpt-4o-2024-08-06', object='response', output=[ResponseOutputMessage(id='msg_0220b23f8cda4c96006943aa3b30c0819392a5780180d12950', content=[ResponseOutputText(annotations=[], text='Hi there! How can I assist you today?', type='output_text', logprobs=[])], role='assistant', status='completed', type='message')], parallel_tool_calls=True, temperature=1.0, tool_choice='auto', tools=[], top_p=1.0, max_output_tokens=None, previous_response_id=None, reasoning=Reasoning(effort=None, generate_summary=None, summary=None), status='completed', text=ResponseTextConfig(format=ResponseFormatText(type='text'), verbosity='medium'), truncation='disabled', usage=ResponseUsage(input_tokens=18, input_tokens_details=InputTokensDetails(cached_tokens=0), output_tokens=11, output_tokens_details=OutputTokensDetails(reasoning_tokens=0), total_tokens=29), user=None, background=False, billing={'payer': 'openai'}, max_tool_calls=None, prompt_cache_key=None, prompt_cache_retention=None, safety_identifier=None, service_tier='default', store=True, top_logprobs=0)
+
+2. Testing String input: 'Hello'
+Success (String)!
+Output: Hi there! How can I assist you today?
+Debug complete.
