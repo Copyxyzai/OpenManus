@@ -124,6 +124,12 @@ One line for run OpenManus:
 python main.py
 ```
 
+Or after installing the package, you can use the `openmanus` command:
+
+```bash
+openmanus
+```
+
 Then input your idea via terminal!
 
 For MCP tool version, you can run:

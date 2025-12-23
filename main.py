@@ -5,7 +5,7 @@ from app.agent.manus import Manus
 from app.logger import logger
 
 
-async def main():
+async def async_main():
     # Parse command line arguments
     parser = argparse.ArgumentParser(description="Run Manus agent with a prompt")
     parser.add_argument(
@@ -32,5 +32,10 @@ async def main():
         await agent.cleanup()
 
 
+def main():
+    """Entry point for the openmanus console script."""
+    asyncio.run(async_main())
+
+
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
